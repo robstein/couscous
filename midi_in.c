@@ -11,11 +11,10 @@ void sighandler(int dum) {
 int main() {
 	int err;
 	snd_rawmidi_t *handle_in = 0;
-	char *node_in = NULL;
 	
 	err = snd_rawmidi_open(&handle_in, NULL, "hw:1,0,0", 0);
 	if (err) {
-		fprintf(stderr,"snd_rawmidi_open %s failed: %d\n",err);
+		fprintf(stderr,"snd_rawmidi_open failed: %d\n",err);
 	}
 		
 	signal(SIGINT, sighandler);
