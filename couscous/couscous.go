@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/jgarff/rpi_ws281x/golang/ws2811"
 	"github.com/robstein/couscous/midi"
 	"os"
 	"os/signal"
+	"rand"
 	"syscall"
 	"unsafe"
 )
@@ -19,17 +21,15 @@ import "C"
 func main() {
 	// Set up the pipeline.
 	c := inputStream("hw:1,0,0")
-	messages := midi.Parse(c)
+	midiMessages := midi.Parse(c)
 
-	for {
-		message := <-messages
-		fmt.Printf("%s %d %d\n", message.Status, message.Data1, message.Data2)
+	defer ws2811.Fini()
+	err := ws2811.Init(18, 101, 255)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ws2811.Init failed: %d\n", err)
+	} else {
+		writeToLEDs(midiMessages)
 	}
-
-	// c_messages := getMidiMessageStreamFromInputByteStream(c_bytes)
-	// displayStringsFromMidiMessages(c_messages)
-
-	// c_ledactions := getLEDActionsFromMidiMessages(c_messages)
 }
 
 func inputStream(midiHandle string) <-chan byte {
@@ -62,48 +62,24 @@ func inputStream(midiHandle string) <-chan byte {
 	return out
 }
 
-type Message struct {
-	Status   byte
-	Note     byte
-	Velocity byte
-}
+const MidiKeyboardOffset = 21
 
-func getMidiMessageStreamFromInputByteStream(in <-chan byte) <-chan Message {
-	out := make(chan Message)
-	go func() {
-		for ch := range in {
-			if ch&0x80 == 0x80 {
-				out <- Message{ch, <-in, <-in}
-			}
-		}
-		close(out)
-	}()
-	return out
-}
-
-func displayStringsFromMidiMessages(in <-chan Message) {
+func writeToLEDs(in <-chan Message) {
 	go func() {
 		for m := range in {
-			str := "?"
-			if m.Status&0xF0 == 0x80 || m.Velocity == 0 {
-				str = fmt.Sprintf("note off: %X", m.Note)
-			} else if m.Status&0xF0 == 0x90 {
-				str = fmt.Sprintf("note on: %X", m.Note)
+			fmt.Printf("Writing %s %d %d\n", message.Status, message.Data1, message.Data2)
+
+			if message.Status == NoteOn {
+				ws2811.SetLed(message.Data1-MidiKeyboardOffset, rand.Uint32())
+			} else {
+				ws2811.SetLed(message.Data1-MidiKeyboardOffset, 0)
 			}
-			fmt.Println(str)
+
+			err := ws2811.Render()
+			if err != nil {
+				ws2811.Clear()
+				fmt.Fprintf(os.Stderr, "ws2811.Render failed: %d\n", err)
+			}
 		}
 	}()
 }
-
-// type LEDAction struct {
-// }
-//
-// func getLEDActionsFromMidiMessages(in <-chan Message) <-chan LEDAction {
-// 	out := make(chan LEDAction)
-// 	go func() {
-// 		for m := range in {
-// 		}
-// 		close(out)
-// 	}()
-// 	return out
-// }
