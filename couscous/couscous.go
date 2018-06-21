@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/robstein/midi"
+	"github.com/robstein/couscous/midi"
 	"os"
 	"os/signal"
 	"syscall"
