@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/robstein/midi"
 	"os"
 	"os/signal"
 	"syscall"
@@ -17,16 +18,21 @@ import "C"
 
 func main() {
 	// Set up the pipeline.
-	c := input("hw:1,0,0")
-	out := parseMessage(groupBytesIntoMessages(c))
+	c := inputStream("hw:1,0,0")
+	messages := midi.Parse(c)
 
-	// Consume the output.
 	for {
-		fmt.Println(<-out)
+		message := <-messages
+		fmt.Printf("%s %d %d\n", message.Status, message.Data1, message.Data2)
 	}
+
+	// c_messages := getMidiMessageStreamFromInputByteStream(c_bytes)
+	// displayStringsFromMidiMessages(c_messages)
+
+	// c_ledactions := getLEDActionsFromMidiMessages(c_messages)
 }
 
-func input(midiHandle string) <-chan byte {
+func inputStream(midiHandle string) <-chan byte {
 	out := make(chan byte)
 	go func() {
 		var handle_in *C.snd_rawmidi_t
@@ -62,7 +68,7 @@ type Message struct {
 	Velocity byte
 }
 
-func groupBytesIntoMessages(in <-chan byte) <-chan Message {
+func getMidiMessageStreamFromInputByteStream(in <-chan byte) <-chan Message {
 	out := make(chan Message)
 	go func() {
 		for ch := range in {
@@ -75,8 +81,7 @@ func groupBytesIntoMessages(in <-chan byte) <-chan Message {
 	return out
 }
 
-func parseMessage(in <-chan Message) <-chan string {
-	out := make(chan string)
+func displayStringsFromMidiMessages(in <-chan Message) {
 	go func() {
 		for m := range in {
 			str := "?"
@@ -85,9 +90,20 @@ func parseMessage(in <-chan Message) <-chan string {
 			} else if m.Status&0xF0 == 0x90 {
 				str = fmt.Sprintf("note on: %X", m.Note)
 			}
-			out <- str
+			fmt.Println(str)
 		}
-		close(out)
 	}()
-	return out
 }
+
+// type LEDAction struct {
+// }
+//
+// func getLEDActionsFromMidiMessages(in <-chan Message) <-chan LEDAction {
+// 	out := make(chan LEDAction)
+// 	go func() {
+// 		for m := range in {
+// 		}
+// 		close(out)
+// 	}()
+// 	return out
+// }
