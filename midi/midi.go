@@ -38,8 +38,10 @@ const (
 	System_Realtime messageCategory = "System Realtime"
 )
 
+const KeyCount = 88
+
 // This Midi receiver changes NoteOn messages with velocity '0' to NoteOff messages.
-func Parse(in <-chan byte) <-chan Message {
+func Deserialize(in <-chan byte) <-chan Message {
 	out := make(chan Message)
 	go func() {
 		// running status buffer is cleared at power up.
