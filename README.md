@@ -1,6 +1,3 @@
-# couscous
-an LED strip controller
-
 ## How to build
 
 Prerequisites:
