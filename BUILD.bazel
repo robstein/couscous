@@ -1,11 +1,6 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
-load("@bazel_buildtools//buildifier:def.bzl", "buildifier")
 
 gazelle(
     name = "gazelle",
-    prefix = "github.com/robstein/orabo",
-)
-
-buildifier(
-    name = "buildifier",
+    prefix = "github.com/robstein/couscous",
 )

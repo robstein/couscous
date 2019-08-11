@@ -1,0 +1,1 @@
+This directory contains examples from https://github.com/FastLED/FastLED/tree/a8873b3e25c3c1c8a30baa08b75416ce9ed7fd23/examples

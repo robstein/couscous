@@ -8,4 +8,7 @@ platformio_library(
     src = "FastLED.cpp",
     add_hdrs = glob(["**/*.h"]),
     add_srcs = glob(["**/*.cpp"]),
+    deps = [
+
+    ]
 )
