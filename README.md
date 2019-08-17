@@ -7,7 +7,7 @@ Prerequisites:
 Build:
  - `make`
 
-## Installing neopixel-driver on a nodemcu microcontroller
+## Installing on a nodemcu microcontroller
  - Buy an [ESP8266](https://www.amazon.com/gp/product/B010N1SPRK) board, a [NeoPixel LED strip](https://www.amazon.com/gp/product/B077F8SQBV), and some [jumper wires](https://www.amazon.com/gp/product/B01LZF1ZSZ).
  - Install the [CP2102 driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers) 
  - Plug it in and run `make neopxiel`
