@@ -1,0 +1,18 @@
+enum Pattern {
+  CYLON = 0;
+  RAINBOW = 1;
+  RAINBOWWITHGLITTER = 2;
+  CONFETTI = 3;
+  SINELON = 4;
+  JUGGLE = 5;
+  BPM = 6;
+}
+
+enum Palette { DEFAULT = 0; }
+
+message Mode {
+  Pattern pattern = 1;
+  Palette palette = 2;
+  uint32 brightness = 3;
+  uint32 frames_per_second = 4;
+}

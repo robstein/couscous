@@ -9,5 +9,3 @@ Prerequisites:
 Build:
  - `make`
 
-Upload to your board:
- - `make upload`
