@@ -14,6 +14,17 @@ http_archive(
     sha256 = "2ef429f5d7ce7111263289644d233707dba35e39696377ebab8b0bc701f7818e",
 )
 
+swift_version = "0.12.1"
+http_archive(
+    name = "build_bazel_rules_swift",
+    sha256 = "18cd4df4e410b0439a4935f9ca035bd979993d42372ba79e7f2d4fafe9596ef0",
+    urls = [
+        "https://github.com/bazelbuild/rules_swift/releases/download/{}/rules_swift.{}.tar.gz".format (swift_version, swift_version),
+    ],
+)
+load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
+swift_rules_dependencies()
+
 apple_support_version = "0.6.0"
 http_archive(
     name = "build_bazel_apple_support",
@@ -21,10 +32,11 @@ http_archive(
     url = "https://github.com/bazelbuild/apple_support/releases/download/{}/apple_support.{}.tar.gz".format (apple_support_version, apple_support_version),
     sha256 = "7356dbd44dea71570a929d1d4731e870622151a5f27164d966dda97305f33471",
 )
-
 load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
-
 apple_support_dependencies()
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+protobuf_deps()
 
 rules_apple_version = "0.17.2"
 http_archive(

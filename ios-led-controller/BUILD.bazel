@@ -1,0 +1,27 @@
+load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application", "ios_ui_test")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+
+load("@build_bazel_rules_apple//apple/testing/default_runner:ios_test_runner.bzl", "ios_test_runner")
+load("@build_bazel_rules_apple//test/testdata/rules:dummy_test_runner.bzl", "dummy_test_runner")
+
+swift_library(
+    name = "LEDControllerLib",
+    srcs = [
+        "AppDelegate.swift",
+        "ViewController.swift"
+    ]
+)
+
+ios_application(
+    name = "led-controller",
+    bundle_id = "com.robstein.LEDController",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    minimum_os_version = "12.2",
+    infoplists = [":Info.plist"],
+    visibility = ["//visibility:public"],
+    deps = [":LEDControllerLib"],
+    provisioning_profile = ":profile.mobileprovision"
+)
