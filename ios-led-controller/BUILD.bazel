@@ -6,10 +6,11 @@ load("@build_bazel_rules_apple//test/testdata/rules:dummy_test_runner.bzl", "dum
 
 swift_library(
     name = "LEDControllerLib",
-    srcs = [
-        "AppDelegate.swift",
-        "ViewController.swift"
-    ]
+    srcs = glob(["*.swift"]),
+    deps = [
+        "@com_github_Alamofire_Alamofire//:Alamofire",
+    ],
+    tags = ["manual"]
 )
 
 ios_application(
@@ -23,5 +24,6 @@ ios_application(
     infoplists = [":Info.plist"],
     visibility = ["//visibility:public"],
     deps = [":LEDControllerLib"],
-    provisioning_profile = ":profile.mobileprovision"
+    provisioning_profile = ":profile.mobileprovision",
+    launch_storyboard = ":LaunchScreen.storyboard",
 )
