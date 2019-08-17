@@ -1,1 +1,1 @@
-build --ios_signing_cert_name="iPhone Developer: Robert Stein (54SY27B8Z2)" --ios_multi_cpus=arm64,armv7
+build --host_force_python=PY2 --ios_signing_cert_name="iPhone Developer: Robert Stein (54SY27B8Z2)" --ios_multi_cpus=arm64,armv7

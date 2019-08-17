@@ -96,3 +96,11 @@ new_git_repository(
     shallow_since = "1562172155 -0700",
     build_file = "com_github_FastLED_FastLED.BUILD",
 )
+
+new_git_repository(
+    name = "com_github_Alamofire_Alamofire",
+    remote = "https://github.com/Alamofire/Alamofire.git",
+    commit = "75bba56748359f297a83f620d45f72cf4ebee4e7",
+    shallow_since = "1553714508 -0400",
+    build_file = "com_github_Alamofire_Alamofire.BUILD",
+)
