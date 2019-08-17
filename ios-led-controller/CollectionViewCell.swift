@@ -1,6 +1,6 @@
 import UIKit
 
-class NumbersCollectionViewCell: UICollectionViewCell {
+class CollectionViewCell: UICollectionViewCell {
     
     var label: UILabel!
     
@@ -21,6 +21,5 @@ class NumbersCollectionViewCell: UICollectionViewCell {
         label.font = UIFont(name: label.font.fontName, size: 12)
         self.contentView.backgroundColor = .white
     }
-}
 
-// 
+}

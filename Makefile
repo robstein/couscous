@@ -20,4 +20,4 @@ ios:
 	${Q}ideviceinstaller --uninstall com.robstein.LEDController
 	${Q}ideviceinstaller --install bazel-bin/ios-led-controller/led-controller.ipa
 
-.PHONY: all test clean neopixel ios
+.PHONY: all test clean neopixel server ios

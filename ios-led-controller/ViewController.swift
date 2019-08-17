@@ -4,35 +4,36 @@ class ViewController: UIViewController {
 
     var headerView: UIView!
     var titleLabel: UILabel!
-    var numbersCollectionView: UICollectionView!
-    let numbersCollectionViewDelegateAndDataSource = NumbersCollectionViewDelegateAndDataSource()
+    var collectionView: UICollectionView!
+    let collectionViewDelegateAndDataSource = CollectionViewDelegateAndDataSource()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupHeaderAndTitleLabel()
+        // setupHeaderAndTitleLabel()
         
         let frame = self.view.frame
         let layout = UICollectionViewFlowLayout()
-        numbersCollectionView = UICollectionView(frame: frame, collectionViewLayout: layout)
-        self.view.addSubview(numbersCollectionView)
+        collectionView = UICollectionView(frame: frame, collectionViewLayout: layout)
+        self.view.addSubview(collectionView)
         
-        numbersCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        numbersCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        numbersCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        numbersCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        numbersCollectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        collectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        // collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
+        collectionView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
     
     
-        numbersCollectionView.register(NumbersCollectionViewCell.self, forCellWithReuseIdentifier: "myCell")
-        numbersCollectionView.delegate = numbersCollectionViewDelegateAndDataSource
-        numbersCollectionView.dataSource = numbersCollectionViewDelegateAndDataSource
+        collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "myCell")
+        collectionView.delegate = collectionViewDelegateAndDataSource
+        collectionView.dataSource = collectionViewDelegateAndDataSource
     }
     
     
     func setupHeaderAndTitleLabel() {
         // Initialize views and add them to the ViewController's view
         headerView = UIView()
-        headerView.backgroundColor = .red
+        headerView.backgroundColor = .darkGray
         self.view.addSubview(headerView)
         
         titleLabel = UILabel()
