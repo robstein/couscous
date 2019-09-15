@@ -3,70 +3,154 @@
 #include <ESP8266WiFi.h>
 #include <string.h>
 
-WiFiServer server(80);
+#define HTTP_STATUS_OK                                                         \
+  String("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: "          \
+         "close\r\n\r\n")
+#define HTTP_STATUS_INTERNAL_ERROR                                             \
+  String("HTTP/1.1 500 OK\r\nContent-Type: text/html\r\nConnection: "          \
+         "close\r\n\r\n")
+#define HTTP_STATUS_NOT_FOUND                                                  \
+  String("HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\nConnection: "   \
+         "close\r\n\r\n")
 
-#define DATA_PIN 6
-#define NUM_LEDS 760
+const int NUM_LEDS = 760;
 CRGBArray<NUM_LEDS> leds;
-#define BRIGHTNESS 96
-#define LED_TYPE NEOPIXEL
+
+enum Pattern {
+  OFF = 0,
+  CYLON = 1,
+  SWIRL = 2,
+};
+// Pattern state = OFF;
+String state;
+
+typedef struct {
+  int status;
+  String body;
+} response;
+
+typedef response *(*handleFn)(String, String);
+
+typedef struct {
+  String method;
+  String path;
+  handleFn handle;
+} handler;
+
+response *handle_get_config(String headers, String body) {
+  Serial.println("[Debug] Received GET config");
+  response *r = (response *)malloc(sizeof(response));
+  r->status = 200;
+  r->body = String(state);
+  return r;
+}
+
+response *handle_post_config(String headers, String body) {
+  Serial.println("[Debug] Received POST config");
+  body.trim();
+  // state = (Pattern)body.toInt();
+  state = body;
+
+  response *r = (response *)malloc(sizeof(response));
+  r->status = 200;
+  r->body = String(state);
+
+  return r;
+}
+
+WiFiServer server(80);
+const int HANDLERS_SIZE = 3;
+handler handlers[HANDLERS_SIZE] = {
+    (handler){"GET", "/config", handle_get_config},
+    (handler){"POST", "/config", handle_post_config},
+};
+
+const int DATA_PIN = 6;
+const int BRIGHTNESS = 96;
 
 void setup() {
   Serial.begin(9600);
 
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("LEDLamp", "12345678");
+  WiFi.softAP("nodemcu-testing", "12345678");
   server.begin();
 
-  FastLED.addLeds<LED_TYPE, DATA_PIN>(leds, NUM_LEDS)
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS)
       .setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
+
+  state = "";
 }
 
-void loop() {
+void ledShow() {}
 
-  CRGB value = CRGB(0, 0, 0);
-  int index = -1;
-
+void serve() {
   WiFiClient client = server.available();
-  // wait for a client (web browser) to connect
   if (client) {
-    Serial.println("\n[Client connected]");
+    handleFn fn = NULL;
+    String headers = "";
+    String body = "";
+
+    bool scanningfirstLine = true;
+    bool scanningHeaders = false;
+    bool scanningBody = false;
+
     while (client.connected()) {
-      // read line by line what the client (web browser) is requesting
       if (client.available()) {
-        String line = client.readStringUntil('\r');
-        Serial.print(line);
-        if (line.startsWith("GET /on/")) {
-          String strval = line.substring(8, line.lastIndexOf(" "));
-          Serial.println("[Debug] Received message to turn LED + " + strval +
-                         " ON");
-          index = strval.toInt();
-          value = CRGB(255, 0, 0);
-        } else if (line.startsWith("GET /off/")) {
-          String strval = line.substring(9, line.lastIndexOf(" "));
-          Serial.println("[Debug] Received message to turn LED + " + strval +
-                         " OFF");
-          index = strval.toInt();
+        String line;
+        if (!scanningBody) {
+          line = client.readStringUntil('\r');
+        } else {
+          line = client.readString();
         }
-        // wait for end of client's request, that is marked with an empty line
-        if (line.length() == 1 && line[0] == '\n') {
-          client.print("HTTP/1.1 200 OK\r\nContent-Type: "
-                       "text/html\r\nConnection: close\r\n\r\n");
+        Serial.print(line);
+
+        if (scanningfirstLine) {
+          for (int i = 0; i < HANDLERS_SIZE; i++) {
+            if (line.startsWith(handlers[i].method + " " + handlers[i].path)) {
+              fn = handlers[i].handle;
+              break;
+            }
+          }
+          scanningfirstLine = false;
+          scanningHeaders = true;
+          continue;
+        }
+
+        if (scanningHeaders) {
+          headers += line;
+          if ((line.length() == 1 && line[0] == '\n')) {
+            scanningHeaders = false;
+            scanningBody = true;
+            continue;
+          }
+        }
+
+        if (scanningBody) {
+          body += line;
           break;
         }
       }
     }
-    delay(1); // give the web browser time to receive the data
 
-    // close the connection:
+    if (fn != NULL) {
+      response *r = (fn)(headers, body);
+
+      if (r->status == 200) {
+        client.print(HTTP_STATUS_OK + r->body);
+      } else {
+        client.print(HTTP_STATUS_INTERNAL_ERROR);
+      }
+    } else {
+      client.print(HTTP_STATUS_NOT_FOUND);
+    }
+
+    delay(1);
     client.stop();
-    Serial.println("[Client disonnected]");
   }
+}
 
-  if (index != -1) {
-    leds[index] = value;
-    FastLED.show();
-    delay(1000);
-  }
+void loop() {
+  ledShow();
+  serve();
 }

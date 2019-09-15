@@ -1,18 +1,42 @@
 enum Pattern {
-  CYLON = 0;
-  RAINBOW = 1;
-  RAINBOWWITHGLITTER = 2;
-  CONFETTI = 3;
-  SINELON = 4;
-  JUGGLE = 5;
-  BPM = 6;
+  OFF = 0;
+  CYLON = 1;
+  SWIRL = 2;
 }
 
-enum Palette { DEFAULT = 0; }
-
-message Mode {
+message Config {
   Pattern pattern = 1;
-  Palette palette = 2;
-  uint32 brightness = 3;
-  uint32 frames_per_second = 4;
 }
+
+// This could get pretty complex. We'll start with simple hardcoded patterns.
+
+// message Config {
+//   Pattern pattern = 1;
+//   Palette palette = 2;
+//   uint32 brightness = 3;
+//   uint32 frames_per_second = 4;
+//   repeated Range ranges = 5;
+// }
+
+// enum Pattern {
+//   CYLON = 0;
+//   RAINBOW = 1;
+//   RAINBOWWITHGLITTER = 2;
+//   CONFETTI = 3;
+//   SINELON = 4;
+//   JUGGLE = 5;
+//   BPM = 6;
+// }
+
+// enum Palette { 
+//   DEFAULT = 0; 
+// }
+
+// message Palette {
+//   repeated Color colors = 1;
+// }
+
+// message Range {
+//   uint32 begin_index = 0; // the beginning index, inclusive.
+//   uint32 end_index = 1; // the ending index, exclusive.
+// }

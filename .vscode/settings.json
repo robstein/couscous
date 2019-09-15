@@ -1,7 +1,9 @@
 {
     "editor.formatOnSave": true,
     "files.associations": {
-        "random": "cpp"
+        "random": "cpp",
+        "__tuple": "cpp",
+        "array": "cpp"
     },
     "files.exclude": {
         "**/.git": true,
